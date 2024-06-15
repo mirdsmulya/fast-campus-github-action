@@ -47,7 +47,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ env.ECR_REPOSITORY }}
-          IMAGE_TAG: v${{ github.ref }}.replace('refs/tags/', '')
+          IMAGE_TAG: ${{  github.ref_name }}"
         run: |
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
