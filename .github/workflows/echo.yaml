@@ -33,7 +33,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
         with:
-          region: ap-southeast-1 # Change to your AWS region
+          # region: ap-southeast-1 # Change to your AWS region
           mask-password: "true"
 
       # Build, tag, and push image to Amazon ECR
