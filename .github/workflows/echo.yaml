@@ -6,10 +6,10 @@ on:
   # Triggers the workflow on push or pull request events for main
   push:  
     branches: [ main ]
-    tags:
-      - v*.*.*
-  # pull_request:
-  #   branches: [ main ]
+    tags: [ v*.*.* ]
+      
+  pull_request:
+    branches: [ main ]
 
 
   # Allows you to run this workflow manually from the Actions tab
@@ -47,7 +47,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ env.ECR_REPOSITORY }}
-          IMAGE_TAG: ${{  github.ref_name }}"
+          IMAGE_TAG: ${{  github.ref_name }}
         run: |
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
