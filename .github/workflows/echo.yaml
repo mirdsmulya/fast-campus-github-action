@@ -6,8 +6,11 @@ on:
   # Triggers the workflow on push or pull request events for main
   push:  
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    tags:
+      - v*.*.*
+  # pull_request:
+  #   branches: [ main ]
+
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -40,10 +43,11 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build, tag, and push docker image to Amazon ECR
+        if: startsWith(github.ref, 'refs/tags/')
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: fast-campus
-          IMAGE_TAG: ${{ github.sha }}
+          REPOSITORY: ${{ env.ECR_REPOSITORY }}
+          IMAGE_TAG: v${{ github.ref }}.replace('refs/tags/', '')
         run: |
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
