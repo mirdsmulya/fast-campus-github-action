@@ -1,6 +1,4 @@
-name: CI
-
-# Controls when the workflow will run
+name: CI/CD to AWS EKS
 
 on:
   # Triggers the workflow on push or pull request events for main
@@ -11,18 +9,17 @@ on:
   pull_request:
     branches: [ main ]
 
-
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 env:
   AWS_REGION: ap-southeast-1                   # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY: fast-campus                  # set this to your ECR repository name 
-  EKS_CLUSTER_NAME: fast-campus-cluster           # set this to your EKS cluster name 
-  APP_NAME: hello-world                         # set this to your application name
-  ENVIRONMENT: staging                          # set this to your environment, e.g. staging, production
-  KUBERNETES_NAMESPACE: app-staging                 # set this to your Kubernetes namespace
-  HELM_CHART_PATH: deployment/k8s
+  EKS_CLUSTER_NAME: fast-campus-cluster        # set this to your EKS cluster name 
+  KUBERNETES_ENVIRONMENT: staging              # set this to your environment, e.g. staging, production
+  KUBERNETES_NAMESPACE: app-staging            # set this to your Kubernetes namespace
+  HELM_CHART_PATH: deployment/k8s              # set this to your Helm chart path
+  HELM_CHART_NAME: hello-world                 # set this to your Helm chart name
 
 # A workflow run is made up of one or more jobs 
 jobs:
@@ -31,9 +28,7 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps are a sequence of tasks executed as part of a job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v3
 
       - name: Configure AWS credentials
@@ -53,7 +48,6 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ env.ECR_REPOSITORY }}
           IMAGE_TAG: ${{  github.ref_name }}
-          # IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
@@ -91,7 +85,6 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ env.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.ref_name }}
-          # IMAGE_TAG: ${{ github.sha }}
         run: |
-          helm upgrade --install $APP_NAME ./$HELM_CHART_PATH -f $HELM_CHART_PATH/values-$ENVIRONMENT.yaml --namespace $KUBERNETES_NAMESPACE \
+          helm upgrade --install $HELM_CHART_NAME ./$HELM_CHART_PATH -f $HELM_CHART_PATH/values-$KUBERNETES_ENVIRONMENT.yaml --namespace $KUBERNETES_NAMESPACE \
             --set image.tag=$IMAGE_TAG
