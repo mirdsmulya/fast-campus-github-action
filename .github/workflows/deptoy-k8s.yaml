@@ -94,5 +94,4 @@ jobs:
           # IMAGE_TAG: ${{ github.sha }}
         run: |
           helm upgrade --install $APP_NAME ./$HELM_CHART_PATH -f $HELM_CHART_PATH/values-$ENVIRONMENT.yaml --namespace $KUBERNETES_NAMESPACE \
-            --set image.repository=$REGISTRY/$REPOSITORY \
             --set image.tag=$IMAGE_TAG
