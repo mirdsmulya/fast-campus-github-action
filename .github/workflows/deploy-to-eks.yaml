@@ -12,8 +12,7 @@ env:
   AWS_REGION: ap-southeast-1                   # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY: fast-campus                  # set this to your ECR repository name 
   EKS_CLUSTER_NAME: fast-campus-cluster        # set this to your EKS cluster name 
-  KUBERNETES_ENVIRONMENT: staging              # set this to your environment, e.g. staging, production
-  KUBERNETES_NAMESPACE: app-staging            # set this to your Kubernetes namespace
+  KUBERNETES_NAMESPACE: app                    # set this to your Kubernetes namespace
   HELM_CHART_PATH: deployment/k8s              # set this to your Helm chart path
   HELM_CHART_NAME: hello-world                 # set this to your Helm chart name
 
@@ -82,5 +81,5 @@ jobs:
           REPOSITORY: ${{ env.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.ref_name }}
         run: |
-          helm upgrade --install $HELM_CHART_NAME ./$HELM_CHART_PATH -f $HELM_CHART_PATH/values-$KUBERNETES_ENVIRONMENT.yaml --namespace $KUBERNETES_NAMESPACE \
+          helm upgrade --install $HELM_CHART_NAME ./$HELM_CHART_PATH -f $HELM_CHART_PATH/values.yaml --namespace $KUBERNETES_NAMESPACE \
             --set image.tag=$IMAGE_TAG
