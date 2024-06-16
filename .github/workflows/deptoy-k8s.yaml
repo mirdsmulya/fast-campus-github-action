@@ -88,6 +88,6 @@ jobs:
           REPOSITORY: ${{ env.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.ref_name }}
         run: |
-          helm upgrade --install $APP_NAME ./k8s -f values-$ENVIRONMENT.yaml -n $KUBERNETES_NAMESPACE \
+          helm upgrade --install $APP_NAME ./deployment/k8s -f deploymenty/k8s/values-$ENVIRONMENT.yaml -n $KUBERNETES_NAMESPACE \
             --set image.repository=$REGISTRY/$REPOSITORY \
             --set image.tag=$IMAGE_TAG
