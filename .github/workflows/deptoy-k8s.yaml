@@ -17,7 +17,8 @@ on:
 
 env:
   AWS_REGION: ap-southeast-1                   # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: fast-campus                  # set this to your ECR repository name  
+  ECR_REPOSITORY: fast-campus                  # set this to your ECR repository name 
+  EKS_CLUSTER_NAME: fast-campus-cluster           # set this to your EKS cluster name 
   APP_NAME: hello-world                         # set this to your application name
   ENVIRONMENT: staging                          # set this to your environment, e.g. staging, production
   KUBERNETES_NAMESPACE: app-staging                 # set this to your Kubernetes namespace
@@ -68,12 +69,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Set up kubectl
-        uses: aws-actions/eks-kubectl-action@v1
-        with:
-          cluster-name: fast-campus-cluster
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          role-session-name: github-actions-session
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+
 
       - name: Install Helm
         run: |
@@ -88,6 +93,6 @@ jobs:
           REPOSITORY: ${{ env.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.ref_name }}
         run: |
-          helm upgrade --install $APP_NAME ./deployment/k8s -f deploymenty/k8s/values-$ENVIRONMENT.yaml -n $KUBERNETES_NAMESPACE \
+          helm upgrade --install $APP_NAME ./deployment/k8s -f deployment/k8s/values-$ENVIRONMENT.yaml -n $KUBERNETES_NAMESPACE \
             --set image.repository=$REGISTRY/$REPOSITORY \
             --set image.tag=$IMAGE_TAG
