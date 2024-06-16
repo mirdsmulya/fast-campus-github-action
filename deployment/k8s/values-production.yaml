@@ -1,0 +1,19 @@
+nameOverride: "hello-world-production"
+replicaCount: 3
+
+image:
+  repository: 675327529402.dkr.ecr.ap-southeast-1.amazonaws.com/fast-campus
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "v0.0.3"
+
+service: 
+  targetPort: 5000
+
+resources: 
+  limits:
+    cpu: 200m
+    memory: 128Mi
+  requests:
+    cpu: 200m
+    memory: 128Mi
