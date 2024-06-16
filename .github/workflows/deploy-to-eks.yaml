@@ -18,9 +18,27 @@ env:
 
 # A workflow run is made up of one or more jobs 
 jobs:
+  # This workflow contains a job called "Run Go tests"
+  go-test:
+    name: Run Go tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.22
+
+      - name: Run tests
+        run: go test -v ./...
+
   # This workflow contains a job called "build and push image"
   build-and-push-image:
     # The type of runner that the job will run on
+    name: Build and push Docker image to Amazon ECR
+    needs: go-test
     runs-on: ubuntu-latest
     if: startsWith (github.ref, 'refs/tags/')
 
